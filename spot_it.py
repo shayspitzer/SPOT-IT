@@ -1,20 +1,6 @@
 from itertools import combinations
-from random import randint
-
-
-def sum_triples(triples):  # meant to take the sum of each triple in a deck
-    n = len(triples[0]) - 1
-    sums = []
-    for i in range(0, len(triples) - 2, 3):
-        t1 = triples[i]
-        t2 = triples[i + 1]
-        t3 = triples[i + 2]
-        tsum = 0
-        for j in range(n):
-            t = t1[j] + t2[j] + t3[j]
-            tsum += t
-        sums.append(tsum % n)
-    return sums
+from random import randint, shuffle
+from collections import deque
 
 
 class SpotIt:
@@ -72,39 +58,36 @@ class SpotIt:
             step += 1
         return cards
 
-    def make_tricap(self, s):  # make a complete cap of at most size n
-        n = self.n
-        cards = self.cards
-        cap = []
-        k1 = randint(0, n ** 2 + n - 1)
-        card1 = cards[k1]
-        cap.append(card1)
-        cards.remove(card1)
-        k2 = randint(0, n ** 2 + n - 2)
-        card2 = cards[k2]
-        cap.append(card2)
-        cards.remove(card2)
-
-        ints = set(card1).intersection(set(card2))
-
-        for card in cards:
-            if len(cap) == s:
-                break
-            if len(set(card).intersection(ints)) < 1:
-                for thing in cap:
-                    ints = ints.union(set(card).intersection(set(thing)))
-                cap.append(card)
-        cards.append(card1)
-        cards.append(card2)
-        return cap
-
-    def find_triples(self):
-        cards = self.cards
+    def find_triples(self):   # find all triples in the deck
+        cards = self.cards    # a triple is a set of 3 cards that all share one symbol (integer)
         triples = []
-        for (c, d, e) in combinations(cards, 3):
-            (x, y, z) = (set(c), set(d), set(e))
+        for (c, d, e) in combinations(cards, 3):    # just checks every combination of 3 cards
+            (x, y, z) = (set(c), set(d), set(e))    # largely used for smaller decks due to time complexity
             if len(x & y & z) == 1:
                 triples.append(list(x))
                 triples.append(list(y))
                 triples.append(list(z))
         return triples
+
+    def make_tricap(self, s):   # make a complete cap of at most size n
+        n = self.n              # (a cap is a set of cards with no triples)
+        cards = deque(self.cards)   # uses deques for faster pops and insertion
+        shuffle(cards)              # randomizes deck for selection of first 2 cards
+        cap = deque()
+
+        card1 = cards.pop()         # the selection of the first 2 cards is arbitrary
+        cap.append(card1)           # (the relationship between any 2 cards is equivalent)
+        card2 = cards.pop()
+        cap.append(card2)
+
+        ints = set(card1).intersection(set(card2))  # keep track of intersections between cards
+        for card in cards:          # each card added to the cap cannot contain the intersection
+            if len(cap) == s:       # of any 2 cards in the cap
+                break
+            if len(set(card).intersection(ints)) < 1:
+                for thing in cap:
+                    ints = ints.union(set(card).intersection(set(thing)))   # add intersections of new card w/ old cards
+                cap.append(card)
+        cards.append(card1)     # returns deck to its original state (for running many trials)
+        cards.append(card2)
+        return cap
