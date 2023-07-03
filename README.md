@@ -8,6 +8,7 @@ n ** 2 + n + 1 symbols (symbols are integers here) across n ** 2 + n + 1 cards t
 2. Each card contains n + 1 symbols
 3. Each pair of cards share exactly 1 symbol
 If we view cards as lines and symbols as points, note that these axioms describe a finite projective plane of order n.
+
 The class SpotIt permutes the symbols in such a way that the axioms are met. Though there is likely a more efficient way
 to make a deck, the exercise here was to implement the mathematical intuition that I had for the problem.
 
