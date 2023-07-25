@@ -1,6 +1,5 @@
 from itertools import combinations
 from random import randint, shuffle
-from collections import deque
 
 
 def get_more_dependencies(cap, capadds): # used in get_tricap_super_capadds()
